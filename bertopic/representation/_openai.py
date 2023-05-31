@@ -40,8 +40,19 @@ I have a topic that contains the following documents:
 [DOCUMENTS]
 The topic is described by the following keywords: [KEYWORDS]
 
-Based on the information above, extract a short topic label in the following format:
+Based on the information above, extract a topic label as short as possible in the following format:
 topic: <topic label>
+"""
+
+# Based on the information above, extract a short topic label in the following format:
+
+DEFAULT_SUM_PROMPT = """
+I have a topic that is described by the following keywords: [KEYWORDS]
+In this topic, the following documents are a small but representative subset of all documents in the topic:
+[DOCUMENTS]
+
+Based on the information above, please give a description of this topic as short as possible in the following format:
+topic: <description>
 """
 
 
@@ -121,25 +132,28 @@ class OpenAI(BaseRepresentation):
                  model: str = "text-ada-001",
                  prompt: str = None,
                  generator_kwargs: Mapping[str, Any] = {},
-                 delay_in_seconds: float = None,
-                 exponential_backoff: bool = False,
+                 delay_in_seconds: float = 5,       # None,
+                 exponential_backoff: bool = True,  # False,
                  chat: bool = False,
+                 summary: bool = True,  # custom
+                 region: str = 'US',    # custom
                  nr_docs: int = 4,
                  diversity: float = None
                  ):
         self.model = model
         
         if prompt is None:
-            self.prompt = DEFAULT_CHAT_PROMPT if chat else DEFAULT_PROMPT
+            self.prompt = DEFAULT_SUM_PROMPT if summary and chat else DEFAULT_CHAT_PROMPT if chat else DEFAULT_PROMPT
         else:
             self.prompt = prompt
 
-        self.default_prompt_ = DEFAULT_CHAT_PROMPT if chat else DEFAULT_PROMPT
+        self.default_prompt_ = DEFAULT_SUM_PROMPT if summary and chat else DEFAULT_CHAT_PROMPT if chat else DEFAULT_PROMPT
         self.delay_in_seconds = delay_in_seconds
         self.exponential_backoff = exponential_backoff
         self.chat = chat
         self.nr_docs = nr_docs
         self.diversity = diversity
+        self.region = region
 
         self.generator_kwargs = generator_kwargs
         if self.generator_kwargs.get("model"):
@@ -204,9 +218,11 @@ class OpenAI(BaseRepresentation):
         keywords = list(zip(*topics[topic]))[0]
 
         # Use the Default Chat Prompt
-        if self.prompt == DEFAULT_CHAT_PROMPT or self.prompt == DEFAULT_PROMPT:
+        if self.prompt == DEFAULT_SUM_PROMPT or self.prompt == DEFAULT_CHAT_PROMPT or self.prompt == DEFAULT_PROMPT:
             prompt = self.prompt.replace("[KEYWORDS]", " ".join(keywords))
             prompt = self._replace_documents(prompt, docs)
+            if self.region == 'KR':
+                prompt = prompt.replace("in the following format:", "in the following format in Korean:")
 
         # Use a custom prompt that leverages keywords, documents or both using
         # custom tags, namely [KEYWORDS] and [DOCUMENTS] respectively
@@ -217,6 +233,7 @@ class OpenAI(BaseRepresentation):
             if "[DOCUMENTS]" in prompt:
                 prompt = self._replace_documents(prompt, docs)
 
+                
         return prompt
 
     @staticmethod
