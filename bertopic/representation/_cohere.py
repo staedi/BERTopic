@@ -90,7 +90,8 @@ class Cohere(BaseRepresentation):
                  client,
                  model: str = "xlarge",
                  prompt: str = None,
-                 delay_in_seconds: float = None,
+                 delay_in_seconds: float = 5,   # None,
+                 region: str = 'US',            # custom
                  nr_docs: int = 4,
                  diversity: float = None
                  ):
@@ -101,6 +102,7 @@ class Cohere(BaseRepresentation):
         self.delay_in_seconds = delay_in_seconds
         self.nr_docs = nr_docs
         self.diversity = diversity
+        self.region = region
 
     def extract_topics(self,
                        topic_model,
