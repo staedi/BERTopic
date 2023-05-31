@@ -11,6 +11,7 @@ from sklearn import __version__ as sklearn_version
 
 class KeyBERTInspired(BaseRepresentation):
     def __init__(self,
+                 region: str = 'US',    # custom
                  top_n_words: int = 10,
                  nr_repr_docs: int = 5,
                  nr_samples: int = 500,
@@ -62,6 +63,7 @@ class KeyBERTInspired(BaseRepresentation):
         self.nr_samples = nr_samples
         self.nr_candidate_words = nr_candidate_words
         self.random_state = random_state
+        self.region = region
 
     def extract_topics(self,
                        topic_model,
