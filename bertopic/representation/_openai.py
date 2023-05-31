@@ -5,6 +5,7 @@ from scipy.sparse import csr_matrix
 from typing import Mapping, List, Tuple, Any
 from bertopic.representation._base import BaseRepresentation
 from bertopic.representation._utils import retry_with_exponential_backoff
+from tqdm import tqdm
 
 
 DEFAULT_PROMPT = """
@@ -185,7 +186,7 @@ class OpenAI(BaseRepresentation):
 
         # Generate using OpenAI's Language Model
         updated_topics = {}
-        for topic, docs in repr_docs_mappings.items():
+        for topic, docs in tqdm(repr_docs_mappings.items()):
             prompt = self._create_prompt(docs, topic, topics)
 
             # Delay
