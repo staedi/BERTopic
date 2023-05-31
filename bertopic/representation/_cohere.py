@@ -3,6 +3,7 @@ import pandas as pd
 from scipy.sparse import csr_matrix
 from typing import Mapping, List, Tuple
 from bertopic.representation._base import BaseRepresentation
+from tqdm import tqdm
 
 
 DEFAULT_PROMPT = """
@@ -126,7 +127,7 @@ class Cohere(BaseRepresentation):
 
         # Generate using Cohere's Language Model
         updated_topics = {}
-        for topic, docs in repr_docs_mappings.items():
+        for topic, docs in tqdm(repr_docs_mappings.items()):
             prompt = self._create_prompt(docs, topic, topics)
 
             # Delay
