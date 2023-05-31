@@ -7,6 +7,7 @@ from typing import Mapping, List, Tuple, Union
 from sklearn.metrics.pairwise import cosine_similarity
 from bertopic.representation._base import BaseRepresentation
 from sklearn import __version__ as sklearn_version
+from tqdm import tqdm
 
 
 class KeyBERTInspired(BaseRepresentation):
@@ -191,7 +192,7 @@ class KeyBERTInspired(BaseRepresentation):
         """
         labels = [int(label) for label in sorted(list(topics.keys()))]
         updated_topics = {}
-        for i, topic in enumerate(labels):
+        for i, topic in tqdm(enumerate(labels)):
             indices = [vocab.index(word) for word in topics[topic]]
             values = sim[:, indices][i]
             word_indices = [indices[index] for index in np.argsort(values)[-self.top_n_words:]]
