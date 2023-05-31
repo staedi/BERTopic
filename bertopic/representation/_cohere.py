@@ -124,7 +124,8 @@ class Cohere(BaseRepresentation):
         """
         # Extract the top 4 representative documents per topic
         repr_docs_mappings, _, _, _ = topic_model._extract_representative_docs(c_tf_idf, documents, topics, 500, self.nr_docs, self.diversity)
-
+        print(repr_docs_mappings)
+        
         # Generate using Cohere's Language Model
         updated_topics = {}
         for topic, docs in tqdm(repr_docs_mappings.items()):
